@@ -24,9 +24,9 @@
     body("email").isEmail().withMessage(`E-Mail ${emailError}`).trim(),
     body("password")
       .trim()
-      .isLength({ min: 4 })
+      .isLength({ min: 8 })
       .withMessage("password must have at least 12 characters")
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[W_]).{8,}$/)
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/)
       .withMessage(
         "Password must be at least 12 characters long and include at least one lowercase letter, one uppercase letter, one number, and one special character"
       ),
@@ -50,9 +50,9 @@
       const salt = saltHash.salt;
       const hash = saltHash.hash;
       try {
-        const user = await dbUser.postNewUser({
+        const user = await dbUser.saveNewUser({
           forename: req.body.forename,
-          lastname: req.body.lastname,
+          surname: req.body.surname,
           email: req.body.email,
           password: `${hash}.${salt}`,
         });
