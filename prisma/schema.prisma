@@ -13,18 +13,84 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(uuid())
-  forename  String
-  surname   String
-  email     String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum Role {
   ADMIN
   USER
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  forename  String
+  surname   String
+  email     String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  posts     Post[]
+  comments  Comment[]
+  likes     Like[]
+  following Follow[]  @relation("UserFollowings")
+  followers Follow[]  @relation("UserFollowers")
+  profile   Profile?
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  bio    String?
+  userId Int     @unique
+  user   User    @relation(fields: [userId], references: [id])
+  Image  Image?
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String // Store the image URL (Supabase, Cloudinary, etc.)
+  createdAt DateTime @default(now())
+  postId    Int?     @unique
+  post      Post?    @relation(fields: [postId], references: [id])
+  profileId Int?     @unique
+  profile   Profile? @relation(fields: [profileId], references: [id])
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  content   String? // Optional if post is image-based
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+  comments  Comment[]
+  likes     Like[]
+  images    Image[] // One-to-many relation (A post can have multiple images)
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Like {
+  id     Int  @id @default(autoincrement())
+  postId Int
+  post   Post @relation(fields: [postId], references: [id])
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id])
+  following   User     @relation("UserFollowings", fields: [followingId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
 }
