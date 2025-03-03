@@ -1,13 +1,13 @@
+const auth = require("express").Router();
+const passport = require("passport");
+const { isUser, isAdmin } = require("../middleware/authRoles");
 
-  const auth = require("express").Router();
-  const passport = require("passport");
-  const { isUser, isAdmin } = require("../middleware/authRoles");
+const usersController = require("../middleware/users");
 
-  const usersController = require("../middleware/users");
+auth.post("/register", usersController.registerUser);
+auth.post("/login", usersController.login);
 
-  auth.post("/register", usersController.registerUser);
+auth.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+auth.get('/github/callback', passport.authenticate('github', { failureRedirect: '/', session: false }), usersController.loginWithGithub);
 
-  auth.post("/login", usersController.login);
-
-  module.exports = auth;
-  
+module.exports = auth;

@@ -32,6 +32,9 @@ const getUserById = (id) => {
     },
   });
 };
+const getUserByGithubId = (githubId) => {
+  return  prisma.user.findUnique({where: { githubId }})
+}
 const getAllUsers = () => {
   return prisma.user.findMany({
     select: {
@@ -70,12 +73,26 @@ const changeEmail = async (email, id) => {
     },
   });
 };
+const saveNewUserFromGithub = async(profile) => {
+  const name = profile.displayName.split(' ');
+  console.log(profile);
+  await prisma.user.create({
+    data: {
+      githubId: profile.id,
+      forename: name[0],
+      surname: name[1],
+      email: profile.emails?.[0]?.value || null,
+    }
+  })
+}
   
-  module.exports = {
+module.exports = {
   saveNewUser,
+  saveNewUserFromGithub,
   getUserByEmail,
   getAllUsers,
   getUserById,
+  getUserByGithubId,
   changeRole,
   deleteUser,
   changeEmail,
