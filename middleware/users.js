@@ -58,6 +58,7 @@ const validateSchema = [
         password: `${hash}.${salt}`,
       });
       if (user) {
+
         const jwt = utils.issueJwt(user);
         return res
           .status(200)
@@ -97,6 +98,7 @@ const login = async (req, res, next) => {
     next(err);
   }
 };
+
 const loginWithGithub = async (req, res, next) => {
   const jwt = utils.issueJwt(req.user);
   return res.status(200).json({

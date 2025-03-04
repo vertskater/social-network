@@ -1,7 +1,8 @@
 const prisma = require('./database');
+const { ImageType } = require('@prisma/client')
 
-  const saveNewUser = async (user) => {
-  return prisma.user.create({
+const saveNewUser = async (user) => {
+  const res = await prisma.user.create({
     data: {
       forename: user.forename,
       surname: user.surname,
@@ -9,6 +10,12 @@ const prisma = require('./database');
       password: user.password,
     },
   });
+  await prisma.profile.create({
+    data: {
+      userId: res.id
+    }
+  })
+  return res;
 };
 
 const getUserByEmail = (email) => {
@@ -75,8 +82,9 @@ const changeEmail = async (email, id) => {
 };
 const saveNewUserFromGithub = async(profile) => {
   const name = profile.displayName.split(' ');
-  console.log(profile);
-  await prisma.user.create({
+  const githubImageUrl = profile.photos?.[0]?.value || null; // Handle missing profile image
+
+  const res = await prisma.user.create({
     data: {
       githubId: profile.id,
       forename: name[0],
@@ -84,8 +92,23 @@ const saveNewUserFromGithub = async(profile) => {
       email: profile.emails?.[0]?.value || null,
     }
   })
+  const newProfile = await prisma.profile.create({
+    data: {
+      userId: res.id
+    }
+  })
+  if(githubImageUrl) {
+    await prisma.image.create({
+      data: {
+        url: githubImageUrl,
+        imageType: ImageType.PROFILE_PICTURE,
+        profileId: newProfile.id
+      }
+    })
+  }
+  return res;
 }
-  
+
 module.exports = {
   saveNewUser,
   saveNewUserFromGithub,

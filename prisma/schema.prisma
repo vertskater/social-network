@@ -18,6 +18,12 @@ enum Role {
   USER
 }
 
+enum ImageType {
+  PROFILE_PICTURE
+  BANNER
+  POST_IMAGE
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   githubId  String?   @unique
@@ -41,17 +47,18 @@ model Profile {
   bio    String?
   userId Int     @unique
   user   User    @relation(fields: [userId], references: [id])
-  Image  Image?
+  images Image[]
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   url       String // Store the image URL (Supabase, Cloudinary, etc.)
-  createdAt DateTime @default(now())
-  postId    Int?     @unique
-  post      Post?    @relation(fields: [postId], references: [id])
-  profileId Int?     @unique
-  profile   Profile? @relation(fields: [profileId], references: [id])
+  createdAt DateTime  @default(now())
+  imageType ImageType
+  postId    Int?      @unique
+  post      Post?     @relation(fields: [postId], references: [id])
+  profileId Int?      @unique
+  profile   Profile?  @relation(fields: [profileId], references: [id])
 }
 
 model Post {
