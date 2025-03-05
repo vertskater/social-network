@@ -1,6 +1,5 @@
 const auth = require("express").Router();
 const passport = require("passport");
-const { isUser, isAdmin } = require("../middleware/authRoles");
 
 const usersController = require("../middleware/users");
 

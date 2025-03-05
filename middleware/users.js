@@ -23,6 +23,7 @@ const validateSchema = [
     .withMessage(`surname ${lengthError}`)
     .trim(),
   body("email").isEmail().withMessage(`E-Mail ${emailError}`).trim(),
+  body("username").isAlpha().withMessage('Username must be Letters (A-Z, a-z) without spaces').trim(),
   body("password")
     .trim()
     .isLength({ min: 8 })
@@ -55,10 +56,10 @@ const validateSchema = [
         forename: req.body.forename,
         surname: req.body.surname,
         email: req.body.email,
+        username: req.body.username,
         password: `${hash}.${salt}`,
       });
       if (user) {
-
         const jwt = utils.issueJwt(user);
         return res
           .status(200)
@@ -90,6 +91,7 @@ const login = async (req, res, next) => {
         msg: "jwt token issued, you are logged in",
         token: jwt.token,
         role: user.role,
+        username: user.username,
         expiresIn: jwt.expires,
       });
     }
@@ -106,6 +108,7 @@ const loginWithGithub = async (req, res, next) => {
     msg: "jwt token issued, you are logged in",
     token: jwt.token,
     role: req.user.role,
+    username: req.user.username,
     expiresIn: jwt.expires,
   });
 }

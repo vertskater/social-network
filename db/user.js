@@ -7,6 +7,7 @@ const saveNewUser = async (user) => {
       forename: user.forename,
       surname: user.surname,
       email: user.email,
+      username: user.username,
       password: user.password,
     },
   });
@@ -29,10 +30,18 @@ const getUserById = (id) => {
   return prisma.user.findUnique({
     select: {
       id: true,
+      forename: true,
+      surname: true,
       email: true,
       role: true,
+      username: true,
       createdAt: true,
       updatedAt: true,
+      profile: {
+        include: {
+          images: true
+        }
+      },
     },
     where: {
       id: id,
@@ -83,12 +92,13 @@ const changeEmail = async (email, id) => {
 const saveNewUserFromGithub = async(profile) => {
   const name = profile.displayName.split(' ');
   const githubImageUrl = profile.photos?.[0]?.value || null; // Handle missing profile image
-
+  console.log(profile);
   const res = await prisma.user.create({
     data: {
       githubId: profile.id,
       forename: name[0],
       surname: name[1],
+      username: profile.username,
       email: profile.emails?.[0]?.value || null,
     }
   })

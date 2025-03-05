@@ -3,7 +3,7 @@ const express = require("express");
 const passport = require("passport");
 const cors = require("cors");
 require("dotenv").config({path: ".env.development"});
-  
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

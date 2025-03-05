@@ -29,6 +29,7 @@ model User {
   githubId  String?   @unique
   forename  String
   surname   String
+  username  String
   email     String    @unique
   password  String?
   role      Role      @default(USER)
