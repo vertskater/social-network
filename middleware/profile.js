@@ -3,6 +3,7 @@ const {supabaseAuthWithPassword} = require('../config/supabase');
 const supabaseDb = require('../db/supabase/supabaseProfileImg');
 const dbImage = require('../db/image');
 const {v4: uuid} = require('uuid');
+const utils = require('../lib/utils');
 require('dotenv').config({path: ".env.development"});
 
 const getUserProfile = async (req, res, next) => {
@@ -29,39 +30,28 @@ const uploadImage = async (req, res, next) => {
     }
     const user = req.user;
     const images = await dbImage.getProfileImages(user.profile.id);
-    if (images.length === 0) {
-      //Upload to Supabase Database
-      const token = await supabaseAuthWithPassword();
-      const filePath = `${uuid()}/${file.originalname}`;
-      const upload = await supabaseDb.saveProfileImageToSupabase(
-        String(process.env.SUPABASE_PROFILEIMG_BUCKET),
-        filePath,
-        file,
-        token
+    const profileImageExists = images.find(img => img.imageType === 'PROFILE_PICTURE')
+
+    if(profileImageExists) {
+      //Delete Profile picture if exists
+      await supabaseDb.deleteProfileImageFromSupabase(
+        process.env.SUPABASE_PROFILEIMG_BUCKET,
+        profileImageExists.url
       )
-      //Postgres DB save path to Supabase
-      const profileImage = await dbImage.saveNewProfileImage(upload.path, user.profile.id);
-      //TODO: change img key to downloaded image
-      return res.status(200).json({success: true, msg: "profile image successfulyy uploaded", img: profileImage})
     }
-    const isTypeProfile = images.filter(img => img.imageType === 'PROFILE_PICTURE')
-    if(images.length > 0 && isTypeProfile.length > 0) {
-      //Delete old profile pic from Supabase
-      await supabaseDb.deleteProfileImageFromSupabase(process.env.SUPABASE_PROFILEIMG_BUCKET, isTypeProfile[0].url)
-      //Upload to Supabase Database
-      const token = await supabaseAuthWithPassword();
-      const filePath = `${uuid()}/${file.originalname}`;
-      const upload = await supabaseDb.saveProfileImageToSupabase(
-        String(process.env.SUPABASE_PROFILEIMG_BUCKET),
-        filePath,
-        file,
-        token
-      )
-      const profileImage= await dbImage.updateNewProfileImage(upload.path, user.profile.id);
-      return res.status(200).json({success: true, msg: 'Profile image successfully updated', img: profileImage})
-    }
+    //Upload to Supabase Database
+    const filePath = `${uuid()}/${file.originalname}`;
+    const profileImage =
+      await utils.supabaseProfileImgUpload(filePath, file, user.profile.id, !!profileImageExists)
+
+    return res.status(200).json({
+      success: true,
+      msg: profileImageExists ? 'Profile image successfully updated' : 'Profile image successfully uploaded',
+      img: profileImage})
+
   }catch (err) {
     console.error(err.message)
+    res.status(500).json({success: false, msg: 'sorry, something went wront, try again later'})
   }
 }
 
