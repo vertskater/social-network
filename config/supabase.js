@@ -6,12 +6,16 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
-const supaBaseAuthWithPassword = async () => {
+const supabaseAuthWithPassword = async () => {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: process.env.SUPABASE_EMAIL,
-    password: process.env.SUPABASE_PASSWORD,
+    email: String(process.env.SUPABASE_EMAIL),
+    password: String(process.env.SUPABAE_PASSWORD),
   });
+  if(error) {
+    console.error('invalid credentials', error)
+    return null;
+  }
   return data.session.access_token;
 };
 
-module.exports = { supabase, supaBaseAuthWithPassword };
+module.exports = { supabase, supabaseAuthWithPassword };
