@@ -1,5 +1,4 @@
 const dbUser = require('../db/user');
-const {supabaseAuthWithPassword} = require('../config/supabase');
 const supabaseDb = require('../db/supabase/supabaseProfileImg');
 const dbImage = require('../db/image');
 const {v4: uuid} = require('uuid');
@@ -54,8 +53,33 @@ const uploadImage = async (req, res, next) => {
     res.status(500).json({success: false, msg: 'sorry, something went wront, try again later'})
   }
 }
+const saveUserProfile = async (req, res, next) => {
+  try {
+    const {forename, surname, bio} = req.body;
+
+    const updateData = {}
+    if(forename) updateData.forename = forename;
+    if(surname) updateData.surname = surname;
+
+    const updateProfile = {}
+    if(bio) updateProfile.bio = bio;
+
+    if(Object.keys(updateData).length === 0 && Object.keys(updateProfile).length === 0) {
+      return res.status(400).json({success: false, msg: "No Data to update user"})
+    }
+
+    const updatedUser =
+      await dbUser.changeUserData(updateData, updateProfile, req.user.id);
+
+    return res.status(200).json({success: true, msg: "user successfully updated", user: updatedUser})
+  }catch (err) {
+    console.error(err.message);
+    return res.status(500).json({success: false, msg: "user could not be updated"})
+  }
+}
 
 module.exports = {
   getUserProfile,
+  saveUserProfile,
   uploadImage
 }

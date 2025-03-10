@@ -1,6 +1,12 @@
 
     const {PrismaClient} = require('@prisma/client');
-    const prisma = new PrismaClient();
+    const prisma = new PrismaClient({
+      omit: {
+        user: {
+          password: true
+        }
+      }
+    });
     
     async function main() {
       await prisma.$connect();

@@ -12,6 +12,8 @@ const upload = multer({
 //GET Routes
 router.get('/:username', passport.authenticate('jwt', {session: false}), isUser, profileController.getUserProfile);
 
+router.post('/:username', passport.authenticate('jwt', {session: false}), isUser, profileController.saveUserProfile)
+
 //POST Routes
 router.post(
   '/upload/image',
@@ -20,5 +22,6 @@ router.post(
   upload.single('profileImage'),
   profileController.uploadImage
 );
+
 
 module.exports = router;

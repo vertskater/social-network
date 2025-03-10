@@ -119,6 +119,23 @@ const saveNewUserFromGithub = async(profile) => {
   return res;
 }
 
+const changeUserData = async (user, profile, userId) => {
+  return prisma.user.update({
+    where: {
+      id: userId
+    },
+    data: {
+      ...user,
+      profile: {
+        update: profile
+      }
+    },
+    include: {
+      profile: true,
+    }
+  })
+}
+
 module.exports = {
   saveNewUser,
   saveNewUserFromGithub,
@@ -129,5 +146,6 @@ module.exports = {
   changeRole,
   deleteUser,
   changeEmail,
+  changeUserData
 };
   

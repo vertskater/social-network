@@ -22,7 +22,6 @@ const updateNewProfileImage = async (imgPath, profileId) => {
   })
 }
 
-
 const getProfileImages = (profileId) => {
   return prisma.image.findMany({
     where: {
