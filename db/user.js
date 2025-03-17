@@ -2,6 +2,12 @@ const prisma = require('./database');
 const { ImageType } = require('@prisma/client')
 
 const saveNewUser = async (user) => {
+  const existingUser = await prisma.user.findUnique({
+    where: {username: user.username}
+  })
+
+  if(existingUser) throw new Error('username already exists');
+
   const res = await prisma.user.create({
     data: {
       forename: user.forename,
@@ -89,15 +95,15 @@ const changeEmail = async (email, id) => {
     },
   });
 };
+
 const saveNewUserFromGithub = async(profile) => {
   const name = profile.displayName.split(' ');
   const githubImageUrl = profile.photos?.[0]?.value || null; // Handle missing profile image
-  console.log(profile);
   const res = await prisma.user.create({
     data: {
       githubId: profile.id,
-      forename: name[0],
-      surname: name[1],
+      forename: name[0] ?? '',
+      surname: name[1] ?? '',
       username: profile.username,
       email: profile.emails?.[0]?.value || null,
     }

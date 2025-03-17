@@ -17,7 +17,18 @@ const getUserProfile = async (req, res, next) => {
   return res.status(200).json({
     success: true,
     msg: 'User Profile found',
-    user: user
+    //TODO: exclude password
+    user: {
+      forename: user.forename,
+      surname: user.surname,
+      email: user.email,
+      role: user.role,
+      username: user.username,
+      profile: {
+        bio: user.profile.bio,
+        images: user.profile.images.filter(image => image.imageType === "PROFILE_PICTURE").map(img => img.url)
+      }
+    }
   })
 }
 
@@ -67,7 +78,6 @@ const saveUserProfile = async (req, res, next) => {
     if(Object.keys(updateData).length === 0 && Object.keys(updateProfile).length === 0) {
       return res.status(400).json({success: false, msg: "No Data to update user"})
     }
-
     const updatedUser =
       await dbUser.changeUserData(updateData, updateProfile, req.user.id);
 
@@ -76,6 +86,7 @@ const saveUserProfile = async (req, res, next) => {
     console.error(err.message);
     return res.status(500).json({success: false, msg: "user could not be updated"})
   }
+
 }
 
 module.exports = {

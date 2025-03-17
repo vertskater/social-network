@@ -3,3 +3,6 @@ node_modules
 .env
 .env.development
 id_rsa_priv.pem
+.idea
+.vscode
+composer

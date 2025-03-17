@@ -10,7 +10,7 @@ const upload = multer({
 })
 
 //GET Routes
-router.get('/:username', passport.authenticate('jwt', {session: false}), isUser, profileController.getUserProfile);
+router.get('/', passport.authenticate('jwt', {session: false}), isUser, profileController.getUserProfile);
 
 router.post('/:username', passport.authenticate('jwt', {session: false}), isUser, profileController.saveUserProfile)
 

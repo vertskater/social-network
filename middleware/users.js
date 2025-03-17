@@ -67,6 +67,8 @@ const validateSchema = [
       }
       res.status(401).json({ success: false });
     } catch (err) {
+      console.error(err.message)
+      res.status(500).json({success: false, msg: "Could not save user"})
       next(err);
     }
   },
@@ -103,14 +105,7 @@ const login = async (req, res, next) => {
 
 const loginWithGithub = async (req, res, next) => {
   const jwt = utils.issueJwt(req.user);
-  return res.status(200).json({
-    success: true,
-    msg: "jwt token issued, you are logged in",
-    token: jwt.token,
-    role: req.user.role,
-    username: req.user.username,
-    expiresIn: jwt.expires,
-  });
+  res.redirect(`${process.env.FRONTEND_URI}/auth/callback?token=${jwt.token}`)
 }
 
 
