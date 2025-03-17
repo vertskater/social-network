@@ -26,7 +26,17 @@ const deleteProfileImageFromSupabase = async (bucketname, path) => {
   return data
 }
 
+const getPublicUrlToProfileImage = async (bucketname, path) => {
+  const {data, error} = supabase.storage.from(bucketname).getPublicUrl(path);
+  if(error) {
+    console.error(error.message);
+    return null
+  }
+  return data;
+}
+
 module.exports = {
   saveProfileImageToSupabase,
-  deleteProfileImageFromSupabase
+  deleteProfileImageFromSupabase,
+  getPublicUrlToProfileImage
 }

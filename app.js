@@ -7,7 +7,10 @@ require("dotenv").config({path: ".env.development"});
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URI,
+  credentials: true
+}));
 
 const PORT = process.env.PORT || 3000;
 
