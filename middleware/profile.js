@@ -17,7 +17,6 @@ const getUserProfile = async (req, res, next) => {
   return res.status(200).json({
     success: true,
     msg: 'User Profile found',
-    //TODO: exclude password
     user: {
       forename: user.forename,
       surname: user.surname,
