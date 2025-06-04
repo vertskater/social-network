@@ -7,7 +7,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const GithubStrategy = require('passport-github2').Strategy;
 require('dotenv').config();
 
-const pathToKey = path.join(__dirname, '..', 'id_rsa_pub.pem');
+const pathToKey = path.join(__dirname, '../id_rsa_pub.pem');
 const PUB_KEY = fs.readFileSync(pathToKey, 'utf8');
 
 const options = {
